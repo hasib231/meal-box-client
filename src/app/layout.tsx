@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import ReduxProvider from "@/providers/ReduxProvider";
+import AuthProvider from "@/providers/AuthProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -8,19 +10,21 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MealBox - Personalized Meal Planning & Delivery",
-  description: "Personalized meal planning and delivery service",
+  title: "MealBox - Personalized Food Delivery",
+  description: "Order food from local restaurants or become a provider",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
+        <ReduxProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ReduxProvider>
       </body>
     </html>
   );
