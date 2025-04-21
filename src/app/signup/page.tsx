@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { useAuth } from "@/hooks/useAuth";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,13 +21,17 @@ import AuthLayout from "@/components/layout/AuthLayout";
 
 const signupSchema = z
   .object({
-    name: z.string().min(2, {
-      message: "Name must be at least 2 characters",
+    name: z.string().min(3, {
+      message: "Name must be at least 3 characters",
     }),
     email: z.string().email({ message: "Please enter a valid email address" }),
-    password: z.string().min(6, {
-      message: "Password must be at least 6 characters",
-    }),
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters" })
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+        message:
+          "Password must contain at least one uppercase letter, one lowercase letter, and one number",
+      }),
     confirmPassword: z.string(),
     role: z.enum(["customer", "provider"], {
       required_error: "Please select a role",
@@ -41,7 +45,8 @@ const signupSchema = z
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
-  const router = useRouter();
+  const { register } = useAuth();
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<SignupFormValues>({
@@ -57,18 +62,20 @@ export default function SignupPage() {
 
   async function onSubmit(values: SignupFormValues) {
     setIsLoading(true);
+    setError(null);
 
-    // In a real application, you would handle registration here
-    console.log(values);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const result = await register({
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      role: values.role,
+    });
 
     setIsLoading(false);
 
-    // Navigate to dashboard or verification page after successful registration
-    // For now, just redirect to login
-    router.push("/login");
+    if (!result.success) {
+      setError(result.error || "Registration failed");
+    }
   }
 
   return (
@@ -82,13 +89,18 @@ export default function SignupPage() {
       }}
     >
       <Form {...form}>
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+            {error}
+          </div>
+        )}
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-700">Name</FormLabel>
+                <FormLabel className="text-gray-700">Full Name</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="John Doe"
@@ -101,6 +113,7 @@ export default function SignupPage() {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="email"
@@ -120,41 +133,7 @@ export default function SignupPage() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem className="space-y-3">
-                <FormLabel className="text-gray-700">Account Type</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    className="flex flex-col space-y-1 mt-1"
-                    disabled={isLoading}
-                  >
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="customer" />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        Customer - I want to order meals
-                      </FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="provider" />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        Meal Provider - I want to sell meal plans
-                      </FormLabel>
-                    </FormItem>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
           <FormField
             control={form.control}
             name="password"
@@ -174,6 +153,7 @@ export default function SignupPage() {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="confirmPassword"
@@ -195,21 +175,48 @@ export default function SignupPage() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full mt-6" disabled={isLoading}>
+
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel className="text-gray-700">Account Type</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-col space-y-1"
+                    disabled={isLoading}
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="customer" />
+                      </FormControl>
+                      <FormLabel className="font-normal">
+                        Customer - I want to order meals
+                      </FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="provider" />
+                      </FormControl>
+                      <FormLabel className="font-normal">
+                        Provider - I want to sell meal services
+                      </FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Creating account..." : "Create account"}
           </Button>
         </form>
       </Form>
-      <p className="text-center text-xs text-muted-foreground mt-4">
-        By clicking create account, you agree to our{" "}
-        <Button variant="link" className="p-0 h-auto font-normal text-xs">
-          Terms of Service
-        </Button>{" "}
-        and{" "}
-        <Button variant="link" className="p-0 h-auto font-normal text-xs">
-          Privacy Policy
-        </Button>
-      </p>
     </AuthLayout>
   );
 }
