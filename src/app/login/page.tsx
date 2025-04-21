@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { useAuth } from "@/hooks/useAuth";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -31,10 +31,11 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const router = useRouter();
+  const { login } = useAuth();
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<LoginFormValues>({
+  const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
@@ -45,18 +46,15 @@ export default function LoginPage() {
 
   async function onSubmit(values: LoginFormValues) {
     setIsLoading(true);
+    setError(null);
 
-    // In a real application, you would handle authentication here
-    console.log(values);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const result = await login(values.email, values.password);
 
     setIsLoading(false);
 
-    // Navigate to dashboard after successful login
-    // For now, just redirect to home
-    router.push("/");
+    if (!result.success) {
+      setError(result.error || "Failed to sign in");
+    }
   }
 
   return (
@@ -70,6 +68,11 @@ export default function LoginPage() {
       }}
     >
       <Form {...form}>
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+            {error}
+          </div>
+        )}
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <FormField
             control={form.control}
