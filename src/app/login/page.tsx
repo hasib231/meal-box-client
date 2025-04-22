@@ -127,7 +127,7 @@ export default function LoginPage() {
                   </FormControl>
                   <div className="leading-none">
                     <FormLabel className="font-normal text-sm text-gray-700">
-                      Remember me
+                      Remember me now
                     </FormLabel>
                   </div>
                 </FormItem>
