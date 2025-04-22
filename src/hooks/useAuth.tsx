@@ -56,14 +56,36 @@ export function useAuth() {
         address: "Default Address", // Add required address field
       };
 
+      console.log("Sending registration request with data:", requestData);
+
       const response = await axiosPublic.post(
         AUTH_ROUTES.REGISTER,
         requestData
       );
 
+      console.log("Registration response:", response.data);
+
       if (response.status === 201 || response.status === 200) {
+        // Wait for a moment before attempting login to ensure the user is fully registered
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         // Auto-login after successful registration
-        return login(userData.email, userData.password);
+        console.log("Registration successful, attempting login");
+        const loginResult = await login(userData.email, userData.password);
+
+        if (!loginResult.success) {
+          console.error(
+            "Auto-login after registration failed:",
+            loginResult.error
+          );
+          return {
+            success: false,
+            error:
+              "Registration successful but auto-login failed. Please try logging in manually.",
+          };
+        }
+
+        return { success: true };
       }
 
       return { success: false, error: "Registration failed" };
@@ -77,12 +99,17 @@ export function useAuth() {
             errors?: Record<string, string[]>;
             success?: boolean;
           };
+          status?: number;
         };
       };
 
       // Log more detailed error information
       if (errorResponse.response?.data) {
-        console.error("Server response:", errorResponse.response.data);
+        console.error("Server response data:", errorResponse.response.data);
+        console.error(
+          "Server response status:",
+          errorResponse.response?.status
+        );
       }
 
       return {
@@ -90,7 +117,7 @@ export function useAuth() {
         error:
           errorResponse.response?.data?.message ||
           errorResponse.response?.data?.error ||
-          "Registration failed",
+          "Registration failed. Please try again later.",
       };
     }
   };
