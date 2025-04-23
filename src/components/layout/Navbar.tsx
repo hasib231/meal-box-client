@@ -13,6 +13,7 @@ const navigation = [
   { name: "Meal Plans", href: "/meal-plans" },
   { name: "How It Works", href: "/how-it-works" },
   { name: "About Us", href: "/about" },
+  { name: "AddMeals", href: " /ProviderDashboard/AddMeals " },
 ];
 
 export default function Navbar() {

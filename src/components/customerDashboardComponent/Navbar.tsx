@@ -15,6 +15,7 @@ const navigation = [
   { name: "Find Meals", href: "/customerDashboard/find-meals" },
   { name: "Order Meal", href: "/customerDashboard/order-meal" },
   { name: "Customer Profile", href: "/customerDashboard/customer-profile" },
+  
   { name: "Home", href: "/" }
 ];
 

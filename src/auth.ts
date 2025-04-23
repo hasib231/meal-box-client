@@ -1,8 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { axiosPublic } from "@/lib/axios";
-import type { JWT } from "next-auth/jwt";
-import type { Session } from "next-auth";
+
 import { AUTH_ROUTES } from "@/routes/api-routes";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -47,12 +46,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             role: userData.role,
           });
 
+          // Make sure to capture the accessToken from the response
+          const accessToken =
+            data.accessToken || data.token || userData.accessToken;
+          console.log(
+            "Auth: Access token captured:",
+            accessToken ? "Found" : "Not found"
+          );
+
           return {
             id: userData._id || userData.id,
             name: userData.name,
             email: userData.email,
             role: userData.role,
-            accessToken: data.accessToken || userData.accessToken,
+            accessToken,
           };
         } catch (error) {
           console.error("Auth: Authentication error:", error);
@@ -67,6 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         console.log("Auth: Setting JWT token with user data:", {
           id: user.id,
           role: user.role,
+          hasAccessToken: !!user.accessToken,
         });
         token.id = user.id;
         token.accessToken = user.accessToken;
@@ -74,25 +82,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token;
     },
-    async session({
-      session,
-      token,
-    }: {
-      session: Session;
-      token: JWT & {
-        id?: string;
-        accessToken?: string;
-        role?: "customer" | "provider";
-      };
-    }) {
+    async session({ session, token }) {
       if (token) {
         console.log("Auth: Updating session with token data:", {
           id: token.id,
           role: token.role,
+          hasAccessToken: !!token.accessToken,
         });
         session.user.id = token.id as string;
-        session.accessToken = token.accessToken;
-        session.user.role = token.role;
+        session.accessToken = token.accessToken as string;
+        session.user.role = token.role as "customer" | "provider";
       }
       return session;
     },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn, signOut, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import type { Session } from "next-auth";
 import { axiosPublic } from "@/lib/axios";
@@ -16,27 +16,37 @@ export function useAuth() {
     role?: "customer" | "provider";
   };
 
-  const login = async (email: string, password: string) => {
-    try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
+// src/hooks/useAuth.tsx (update the login function)
 
-      if (result?.error) {
-        return { success: false, error: "Invalid email or password" };
-      }
+const login = async (email: string, password: string) => {
+  try {
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
 
-      router.push("/");
-      router.refresh();
-      return { success: true };
-    } catch (error) {
-      console.error("Login error:", error);
-      return { success: false, error: "An unexpected error occurred" };
+    if (result?.error) {
+      return { success: false, error: "Invalid email or password" };
     }
-  };
 
+    // Get the session to access the token
+    const session = await getSession();
+    
+    // Store the access token in localStorage
+    if (session?.accessToken) {
+      localStorage.setItem("accessToken", session.accessToken);
+      console.log("Access token stored in localStorage");
+    }
+
+    router.push("/");
+    router.refresh();
+    return { success: true };
+  } catch (error) {
+    console.error("Login error:", error);
+    return { success: false, error: "An unexpected error occurred" };
+  }
+};
   const register = async (userData: {
     name: string;
     email: string;
