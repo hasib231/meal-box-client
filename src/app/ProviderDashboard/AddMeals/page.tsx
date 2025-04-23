@@ -3,15 +3,16 @@
 
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import axios from "axios";
+
 import { useRouter } from "next/navigation";
+import { axiosProtected } from "@/lib/axios";
 
 const AddMealsPage = () => {
   const { user, session } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Form state
   const [mealName, setMealName] = useState("");
   const [description, setDescription] = useState("");
@@ -20,7 +21,7 @@ const AddMealsPage = () => {
   const [portions, setPortions] = useState([
     { size: "small", price: 5.99 },
     { size: "medium", price: 8.99 },
-    { size: "large", price: 11.99 }
+    { size: "large", price: 11.99 },
   ]);
   const [dietTags, setDietTags] = useState<string[]>([]);
   const [availability, setAvailability] = useState(true);
@@ -41,16 +42,20 @@ const AddMealsPage = () => {
   // Handle diet tag selection
   const handleDietTagChange = (tag: string) => {
     if (dietTags.includes(tag)) {
-      setDietTags(dietTags.filter(t => t !== tag));
+      setDietTags(dietTags.filter((t) => t !== tag));
     } else {
       setDietTags([...dietTags, tag]);
     }
   };
 
   // Update portion size
-  const updatePortionSize = (index: number, field: 'size' | 'price', value: string) => {
+  const updatePortionSize = (
+    index: number,
+    field: "size" | "price",
+    value: string
+  ) => {
     const newPortions = [...portions];
-    if (field === 'size') {
+    if (field === "size") {
       newPortions[index].size = value;
     } else {
       newPortions[index].price = parseFloat(value) || 0;
@@ -70,14 +75,14 @@ const AddMealsPage = () => {
 
   // Handle form submission
   // Handle form submission
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-  
+
     // Validate form
     let validationError = null;
-  
+
     if (!mealName.trim()) {
       validationError = "Meal name is required";
     } else if (!description.trim()) {
@@ -89,30 +94,31 @@ const handleSubmit = async (e: React.FormEvent) => {
     } else {
       // Check if all portions have valid size and price
       const invalidPortion = portions.find(
-        p => !p.size.trim() || p.price <= 0
+        (p) => !p.size.trim() || p.price <= 0
       );
-      
+
       if (invalidPortion) {
-        validationError = "All portion sizes must have a name and a price greater than zero";
+        validationError =
+          "All portion sizes must have a name and a price greater than zero";
       }
     }
-  
+
     if (validationError) {
       setError(validationError);
       setIsLoading(false);
       return;
     }
-  
+
     try {
       // Get token from localStorage
       const token = localStorage.getItem("accessToken") || session?.accessToken;
-      
+
       if (!token) {
         setError("Authentication token not found. Please log in again.");
         setIsLoading(false);
         return;
       }
-  
+
       // Create meal data object
       const mealData = {
         userId: user?.id,
@@ -121,28 +127,19 @@ const handleSubmit = async (e: React.FormEvent) => {
         ingredients,
         portions,
         dietTags,
-        availability
+        availability,
       };
-  
+
       console.log("Sending meal data:", mealData);
-  
+
       // Send request directly to the backend API
-      const response = await axios.post(
-        "http://localhost:8000/api/v1/meals",
-        mealData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          }
-        }
-      );
-  
+      const response = await axiosProtected.post("/api/v1/meals", mealData);
+
       console.log("API response:", response.data);
-  
+
       if (response.status === 201 || response.status === 200) {
         alert("Meal added successfully!");
-        
+
         // Reset form
         setMealName("");
         setDescription("");
@@ -150,31 +147,35 @@ const handleSubmit = async (e: React.FormEvent) => {
         setPortions([
           { size: "small", price: 5.99 },
           { size: "medium", price: 8.99 },
-          { size: "large", price: 11.99 }
+          { size: "large", price: 11.99 },
         ]);
         setDietTags([]);
-        
+
         // Redirect to meals list or dashboard
         router.push("/ProviderDashboard");
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error adding meal:", err);
-      
+
       // More detailed error handling
       if (err.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
         console.error("Error response data:", err.response.data);
         console.error("Error response status:", err.response.status);
-        
-        const errorMessage = err.response.data?.message || 
-                            err.response.data?.error || 
-                            "Failed to add meal. Please try again.";
+
+        const errorMessage =
+          err.response.data?.message ||
+          err.response.data?.error ||
+          "Failed to add meal. Please try again.";
         setError(errorMessage);
       } else if (err.request) {
         // The request was made but no response was received
         console.error("No response received:", err.request);
-        setError("No response from server. Please check your connection and try again.");
+        setError(
+          "No response from server. Please check your connection and try again."
+        );
       } else {
         // Something happened in setting up the request that triggered an Error
         console.error("Error message:", err.message);
@@ -186,20 +187,26 @@ const handleSubmit = async (e: React.FormEvent) => {
   };
   // Available diet tags
   const availableDietTags = [
-    "vegetarian", "vegan", "gluten-free", "dairy-free", 
-    "low-carb", "high-protein", "keto", "paleo"
+    "vegetarian",
+    "vegan",
+    "gluten-free",
+    "dairy-free",
+    "low-carb",
+    "high-protein",
+    "keto",
+    "paleo",
   ];
 
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-6">Add New Meal</h1>
-      
+
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl mx-auto">
         {/* Meal Name */}
         <div>
@@ -215,7 +222,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             required
           />
         </div>
-        
+
         {/* Description */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -230,7 +237,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             required
           />
         </div>
-        
+
         {/* Ingredients */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -252,11 +259,14 @@ const handleSubmit = async (e: React.FormEvent) => {
               Add
             </button>
           </div>
-          
+
           {ingredients.length > 0 ? (
             <ul className="mt-2 space-y-1">
               {ingredients.map((item, index) => (
-                <li key={index} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                <li
+                  key={index}
+                  className="flex justify-between items-center bg-gray-50 p-2 rounded"
+                >
                   <span>{item}</span>
                   <button
                     type="button"
@@ -269,10 +279,12 @@ const handleSubmit = async (e: React.FormEvent) => {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-gray-500 mt-1">No ingredients added yet</p>
+            <p className="text-sm text-gray-500 mt-1">
+              No ingredients added yet
+            </p>
           )}
         </div>
-        
+
         {/* Portion Sizes */}
         <div>
           <div className="flex justify-between items-center mb-2">
@@ -287,14 +299,16 @@ const handleSubmit = async (e: React.FormEvent) => {
               + Add Another Size
             </button>
           </div>
-          
+
           {portions.map((portion, index) => (
             <div key={index} className="flex gap-4 mb-2">
               <div className="flex-1">
                 <input
                   type="text"
                   value={portion.size}
-                  onChange={(e) => updatePortionSize(index, 'size', e.target.value)}
+                  onChange={(e) =>
+                    updatePortionSize(index, "size", e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                   placeholder="Size (e.g., Small)"
                   required
@@ -304,7 +318,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <input
                   type="number"
                   value={portion.price}
-                  onChange={(e) => updatePortionSize(index, 'price', e.target.value)}
+                  onChange={(e) =>
+                    updatePortionSize(index, "price", e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                   placeholder="Price"
                   step="0.01"
@@ -324,7 +340,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
           ))}
         </div>
-        
+
         {/* Diet Tags */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -340,14 +356,17 @@ const handleSubmit = async (e: React.FormEvent) => {
                   onChange={() => handleDietTagChange(tag)}
                   className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                 />
-                <label htmlFor={`tag-${tag}`} className="ml-2 text-sm text-gray-700">
+                <label
+                  htmlFor={`tag-${tag}`}
+                  className="ml-2 text-sm text-gray-700"
+                >
                   {tag.charAt(0).toUpperCase() + tag.slice(1)}
                 </label>
               </div>
             ))}
           </div>
         </div>
-        
+
         {/* Availability */}
         <div className="flex items-center">
           <input
@@ -361,7 +380,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             Available for ordering
           </label>
         </div>
-        
+
         {/* Submit Button */}
         <div>
           <button
