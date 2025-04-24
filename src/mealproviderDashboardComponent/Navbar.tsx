@@ -9,17 +9,9 @@ type Props = {
 };
 
 const navigation = [
-   { name: "Select Meals", href: "/customerDashboard/select-meals" },
-   { name: "Track Orders", href: "/customerDashboard/track-order" },
-  // { name: "Manage Preferences", href: "/customerDashboard/manage-preference" },
-   { name: "Find Meals", href: "/customerDashboard/find-meals" },
-  { name: "Order Meal", href: "/customerDashboard/order-meal" },
-<<<<<<< HEAD:src/components/customerDashboardComponent/Navbar.tsx
-  { name: "Customer Profile", href: "/customerDashboard/customer-profile" },
   
-=======
-   { name: "Customer Profile", href: "/customerDashboard/customer-profile" },
->>>>>>> ec78c5cebb9354e44c60b784e8b471965cdfb936:src/customerDashboardComponent/Navbar.tsx
+ 
+  { name: "Post Meal", href: "/mealProviderDashboard/postMeal" },
   { name: "Home", href: "/" }
 ];
 
