@@ -20,31 +20,28 @@ type Props = {
 
 const SideBar = ({ Value }: Props) => {
 
-        const user = {"role":"provider"}
-
-        const comonNavigation = [
-            { name: "Home", href: "/" },
-
-        ];
-          
-        const providerNavigation = [
-            { name: "Select Meals", href: "/ProviderDashboard/select-meals" },
-            { name: "Track Orders", href: "/ProviderDashboard/track-order" },
-            { name: "Manage Preferences", href: "/ProviderDashboard/manage-preference" },
-            { name: "Find Meals", href: "/ProviderDashboard/find-meals" },
-            { name: "Add Meals", href: "/ProviderDashboard/AddMeals" },
-            { name: "Order Meal", href: "/ProviderDashboard/order-meal" },
-            { name: "Provider Profile", href: "/ProviderDashboard/Provider-profile" },
-        ];
-          
-        const customerNavigation = [
-            { name: "Select Meals", href: "/customerDashboard/select-meals" },
-            { name: "Track Orders", href: "/customerDashboard/track-order" },
-            { name: "Manage Preferences", href: "/customerDashboard/manage-preference" },
-            { name: "Customer Profile", href: "/customerDashboard/customer-profile" },
-        ];
+  const user = {"role":"provider"}
+  const comonNavigation = [
+      { name: "Home", href: "/" },
+  ];
     
-        const navigation =user?.role === 'provider' ? [...comonNavigation, ...providerNavigation] : [...comonNavigation, ...customerNavigation];
+  const providerNavigation = [
+      { name: "Manage Menue", href: "/dashboard/provider/manageMenue" },
+      { name: "Respond Orders", href: "/dashboard/provider/respondToOrder" },
+      { name: "View Order", href: "/dashboard/provider/viewOrder" },
+      { name: "Find Meals", href: "/dashboard/provider/find-meals" },
+      { name: "Add Meals", href: "/dashboard/provider/addMeals" },
+      { name: "Order Meal", href: "/dashboard/provider/order-meal" },
+      { name: "Provider Profile", href: "/dashboard/provider-profile" },
+  ];
+    
+  const customerNavigation = [
+      { name: "Select Meals", href: "/dashboard/customer/selectMeals" },
+      { name: "Track Orders", href: "/dashboard/customer/trackOrder" },
+      { name: "Manage Preferences", href: "/dashboard/customer/managePreference" },
+      { name: "Customer Profile", href: "/dashboard/customer/customer-profile" },
+  ];
+  const navigation =user?.role === 'provider' ? [...comonNavigation, ...providerNavigation] : [...comonNavigation, ...customerNavigation];
   
   const pathname=usePathname() 
   console.log(pathname)
