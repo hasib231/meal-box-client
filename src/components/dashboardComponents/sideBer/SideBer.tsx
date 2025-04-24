@@ -23,13 +23,13 @@ const SideBar = ({ Value }: Props) => {
   const user = {"role":"customer"}
   const comonNavigation = [
       { name: "Home", href: "/" },
+      { name: "Find Meals", href: "/dashboard/provider/find-meals" },
   ];
     
   const providerNavigation = [
       { name: "Manage Menue", href: "/dashboard/provider/manageMenue" },
       { name: "Respond Orders", href: "/dashboard/provider/respondToOrder" },
       { name: "View Order", href: "/dashboard/provider/viewOrder" },
-      { name: "Find Meals", href: "/dashboard/provider/find-meals" },
       { name: "Add Meals", href: "/dashboard/provider/addMeals" },
       { name: "Order Meal", href: "/dashboard/provider/order-meal" },
       { name: "Provider Profile", href: "/dashboard/provider-profile" },
