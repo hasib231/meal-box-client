@@ -9,12 +9,12 @@ type Props = {
 };
 
 const navigation = [
-  // { name: "Select Meals", href: "/customerDashboard/select-meals" },
-  { name: "Track Orders", href: "/customerDashboard/track-order" },
-  { name: "Manage Preferences", href: "/customerDashboard/manage-preference" },
-  // { name: "Find Meals", href: "/customerDashboard/find-meals" },
+   { name: "Select Meals", href: "/customerDashboard/select-meals" },
+   { name: "Track Orders", href: "/customerDashboard/track-order" },
+  // { name: "Manage Preferences", href: "/customerDashboard/manage-preference" },
+   { name: "Find Meals", href: "/customerDashboard/find-meals" },
   { name: "Order Meal", href: "/customerDashboard/order-meal" },
-  { name: "Customer Profile", href: "/customerDashboard/customer-profile" },
+   { name: "Customer Profile", href: "/customerDashboard/customer-profile" },
   { name: "Home", href: "/" }
 ];
 
