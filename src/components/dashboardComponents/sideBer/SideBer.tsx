@@ -19,11 +19,10 @@ type Props = {
 // ];
 
 const SideBar = ({ Value }: Props) => {
-
+  
   const user = {"role":"customer"}
   const comonNavigation = [
       { name: "Home", href: "/" },
-      { name: "Find Meals", href: "/dashboard/provider/find-meals" },
   ];
     
   const providerNavigation = [
@@ -31,15 +30,15 @@ const SideBar = ({ Value }: Props) => {
       { name: "Respond Orders", href: "/dashboard/provider/respondToOrder" },
       { name: "View Order", href: "/dashboard/provider/viewOrder" },
       { name: "Add Meals", href: "/dashboard/provider/addMeals" },
-      { name: "Order Meal", href: "/dashboard/provider/order-meal" },
       { name: "Provider Profile", href: "/dashboard/provider-profile" },
   ];
     
   const customerNavigation = [
+      { name: "Find Meals", href: "/findMeals" },
       { name: "Select Meals", href: "/dashboard/customer/selectMeals" },
-      { name: "Track Orders", href: "/dashboard/customer/trackOrder" },
-      { name: "Manage Preferences", href: "/dashboard/customer/managePreference" },
-      { name: "Customer Profile", href: "/dashboard/customer/customer-profile" },
+      { name: "Track Orders", href: "/dashboard/customer/trackOrders" },
+      { name: "Manage Preferences", href: "/dashboard/customer/managePreferences" },
+      { name: "Customer Profile", href: "/dashboard/customer/profile" },
   ];
   const navigation =user?.role === 'provider' ? [...comonNavigation, ...providerNavigation] : [...comonNavigation, ...customerNavigation];
   

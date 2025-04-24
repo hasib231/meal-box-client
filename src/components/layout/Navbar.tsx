@@ -9,16 +9,14 @@ import { useAuth } from "@/hooks/useAuth";
 
 const navigation = [
   { name: "Home", href: "/" },
-<<<<<<< HEAD
   { name: "Dashboard", href: "/dashboard" },
-=======
-  { name: "customerDashboard", href: "/customerDashboard/order-meal" },
-  { name: "mealProviderDashboard", href: "/mealProviderDashboard/postMeal" },
->>>>>>> ec78c5cebb9354e44c60b784e8b471965cdfb936
+  // { name: "customerDashboard", href: "/customerDashboard/order-meal" },
+  // { name: "mealProviderDashboard", href: "/mealProviderDashboard/postMeal" },
   { name: "Meal Plans", href: "/meal-plans" },
   { name: "How It Works", href: "/how-it-works" },
   { name: "About Us", href: "/about" },
-  { name: "AddMeals", href: " /ProviderDashboard/AddMeals " },
+  { name: "Find Meals", href: "/findMeals" },
+  // { name: "AddMeals", href: " /ProviderDashboard/AddMeals " },
 ];
 
 export default function Navbar() {

@@ -1,17 +1,15 @@
 import Image from "next/image";
-// import aos from 'aos';
-// import 'aos/dist/aos.css'; // You can also use <link> for styles
-// ..
-// aos.init();
-const SelectMeal = () => {
-  return (
-    <div className="w-full ">
+
+
+const findMeals = () => {
+    return (
+        <div className="w-full ">
       {/* select option section */}
       <div className=" w-full">
         <div className="flex justify-around  items-center  ">
           <div className=" w-3/12">
             <fieldset className="fieldset w-full ">
-              <legend className="fieldset-legend">restriction</legend>
+              <legend className="fieldset-legend">preferences</legend>
               <select
                 defaultValue="Pick a browser"
                 className="select border border-black  w-full"
@@ -25,7 +23,7 @@ const SelectMeal = () => {
           </div>
           <div className=" w-3/12">
             <fieldset className="fieldset">
-              <legend className="fieldset-legend">restriction</legend>
+              <legend className="fieldset-legend">rating</legend>
               <select
                 defaultValue="Pick a browser"
                 className="select border border-black  "
@@ -39,7 +37,7 @@ const SelectMeal = () => {
           </div>
           <div className=" w-3/12">
             <fieldset className="fieldset">
-              <legend className="fieldset-legend">portion size</legend>
+              <legend className="fieldset-legend">MealProvider</legend>
               <select
                 defaultValue="Pick a browser"
                 className="select border border-black  "
@@ -65,10 +63,10 @@ const SelectMeal = () => {
 
           </div>
         </div>
-
+        
         {/* head line  */}
         <h1 className=" text-center text-3xl my-5 py-5 bg-red-800 text-white">
-          Select Your Meal According To Your Prefered Choice Of Food
+        Choice Your Best Option And Enjoy Your Day
         </h1>
       </div>
       {/* all card of meal in customer dashboard */}
@@ -97,7 +95,7 @@ const SelectMeal = () => {
               </p>
 
               <div className="flex justify-end w-full my-2">
-                <button className="btn btn-secondary text-white bg-red-800  text-2xl py-3 px-5">Select Meal</button>
+                <button className="btn btn-secondary text-white bg-red-800  text-2xl py-3 px-5">order</button>
                 
               </div>
             </div>
@@ -127,7 +125,7 @@ const SelectMeal = () => {
               </p>
 
               <div className="flex justify-end w-full my-2">
-                <button className="btn btn-secondary text-white bg-red-800  text-2xl py-3 px-5">Select Meal</button>
+                <button className="btn btn-secondary text-white bg-red-800  text-2xl py-3 px-5">order</button>
                 
               </div>
             </div>
@@ -157,7 +155,7 @@ const SelectMeal = () => {
               </p>
 
               <div className="flex justify-end w-full my-2">
-                <button className="btn btn-secondary text-white bg-red-800  text-2xl py-3 px-5">Select Meal</button>
+                <button className="btn btn-secondary text-white bg-red-800  text-2xl py-3 px-5">order</button>
                 
               </div>
             </div>
@@ -185,9 +183,8 @@ const SelectMeal = () => {
               <p className="text-lg py-8 ">
                A timeless favorite! Our stone-baked cheese pizza features a crispy golden crust, rich tomato sauce, and a generous layer of melted mozzarella. Perfectly seasoned and freshly made — every bite delivers pure comfort and flavor. Ideal for sharing or indulging solo!
               </p>
-
               <div className="flex justify-end w-full my-2">
-                <button className="btn btn-secondary text-white bg-red-800  text-2xl py-3 px-5">Select Meal</button>
+                <button className="btn btn-secondary text-white bg-red-800  text-2xl py-3 px-5">order</button>
                 
               </div>
             </div>
@@ -195,7 +192,10 @@ const SelectMeal = () => {
         </div>
       </div>
     </div>
-  );
+    );
 };
 
-export default SelectMeal;
+export default findMeals;
+
+
+
