@@ -1,10 +1,10 @@
 "use client";
 
-import Link from 'next/link';
-import {  Eye } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, } from '@/components/ui/avatar';
+import Link from "next/link";
+import { Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Table,
   TableBody,
@@ -12,12 +12,34 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Order } from '@/lib/data';
-import { formatCurrency, formatDateTime, getStatusColor } from '@/lib/utils';
+} from "@/components/ui/table";
+import { formatCurrency, formatDateTime, getStatusColor } from "@/lib/utils";
+
+// Define a more flexible order interface that can handle both mock data and API data
+export interface OrderListItem {
+  id: string;
+  customer: {
+    name: string;
+    email: string;
+  };
+  status: string;
+  total: number;
+  createdAt: string;
+  meals?: Array<{
+    meal: {
+      id: string;
+      name: string;
+      price?: number;
+    };
+    quantity: number;
+    specialInstructions?: string;
+  }>;
+  deliveryAddress?: string;
+  paymentStatus?: string;
+}
 
 interface OrderListProps {
-  orders: Order[];
+  orders: OrderListItem[];
 }
 
 export function OrderList({ orders }: OrderListProps) {
@@ -44,7 +66,9 @@ export function OrderList({ orders }: OrderListProps) {
           ) : (
             orders.map((order) => (
               <TableRow key={order.id}>
-                <TableCell className="font-medium">#{order.id}</TableCell>
+                <TableCell className="font-medium">
+                  #{order.id.substring(0, 8)}
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
@@ -65,7 +89,8 @@ export function OrderList({ orders }: OrderListProps) {
                 <TableCell>{formatDateTime(order.createdAt)}</TableCell>
                 <TableCell>
                   <Badge className={getStatusColor(order.status)}>
-                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                    {order.status.charAt(0).toUpperCase() +
+                      order.status.slice(1)}
                   </Badge>
                 </TableCell>
                 <TableCell>{formatCurrency(order.total)}</TableCell>
@@ -76,7 +101,7 @@ export function OrderList({ orders }: OrderListProps) {
                     size="sm"
                     className="h-8 w-8 p-0"
                   >
-                    <Link href={`/dashboard/provider/orders/${order.id}`}>
+                    <Link href={`/dashboard/provider/viewOrder/${order.id}`}>
                       <span className="sr-only">View order details</span>
                       <Eye className="h-4 w-4" />
                     </Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -39,27 +39,27 @@ const SelectMeal = () => {
   // Auth hook for token handling - we don't need the user object directly
   useAuth();
 
-  useEffect(() => {
-    const fetchMeals = async () => {
-      try {
-        const response = await axiosProtected.get("api/v1/meals");
+  const fetchMeals = useCallback(async () => {
+    try {
+      const response = await axiosProtected.get("api/v1/meals");
 
-        // Only show available meals
-        const availableMeals = response.data.data.filter(
-          (meal: Meal) => meal.availability
-        );
-        setMeals(availableMeals);
-        setFilteredMeals(availableMeals);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching meals:", error);
-        toast.error("Failed to load meals. Please try again.");
-        setLoading(false);
-      }
-    };
-
-    fetchMeals();
+      // Only show available meals
+      const availableMeals = response.data.data.filter(
+        (meal: Meal) => meal.availability
+      );
+      setMeals(availableMeals);
+      setFilteredMeals(availableMeals);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching meals:", error);
+      toast.error("Failed to load meals. Please try again.");
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchMeals();
+  }, [fetchMeals]);
 
   useEffect(() => {
     // Apply filters whenever they change
@@ -122,16 +122,20 @@ const SelectMeal = () => {
     <div className="w-full">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* Filter section */}
-      <div className="w-full py-4 bg-white shadow-sm">
+      {/* Filter section - Updated with consistent colors regardless of theme */}
+      <div className="w-full py-4 bg-gray-100 shadow-sm">
         <div className="flex flex-col md:flex-row justify-around items-center gap-4 px-4">
           <div className="w-full md:w-3/12">
             <fieldset className="fieldset w-full">
-              <legend className="fieldset-legend">Diet Restriction</legend>
+              <legend className="fieldset-legend font-medium text-gray-800">
+                Diet Restriction
+              </legend>
               <select
                 value={dietFilter}
                 onChange={(e) => setDietFilter(e.target.value)}
-                className="select border border-gray-300 rounded w-full p-2"
+                className="select border border-gray-300 rounded w-full p-2 
+                           bg-white text-gray-800"
+                style={{ backgroundColor: "white", color: "#1f2937" }}
               >
                 <option value="">All Diets</option>
                 {uniqueDietTags.map((tag) => (
@@ -145,11 +149,15 @@ const SelectMeal = () => {
 
           <div className="w-full md:w-3/12">
             <fieldset className="fieldset w-full">
-              <legend className="fieldset-legend">Portion Size</legend>
+              <legend className="fieldset-legend font-medium text-gray-800">
+                Portion Size
+              </legend>
               <select
                 value={portionFilter}
                 onChange={(e) => setPortionFilter(e.target.value)}
-                className="select border border-gray-300 rounded w-full p-2"
+                className="select border border-gray-300 rounded w-full p-2 
+                           bg-white text-gray-800"
+                style={{ backgroundColor: "white", color: "#1f2937" }}
               >
                 <option value="">All Sizes</option>
                 {uniquePortionSizes.map((size) => (
@@ -163,13 +171,17 @@ const SelectMeal = () => {
 
           <div className="w-full md:w-3/12">
             <fieldset className="fieldset w-full">
-              <legend className="fieldset-legend">Search</legend>
+              <legend className="fieldset-legend font-medium text-gray-800">
+                Search
+              </legend>
               <input
                 type="text"
                 placeholder="Search meals..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="border border-gray-300 rounded input w-full p-2"
+                className="border border-gray-300 rounded input w-full p-2 
+                           bg-white text-gray-800 placeholder-gray-500"
+                style={{ backgroundColor: "white", color: "#1f2937" }}
               />
             </fieldset>
           </div>
@@ -184,11 +196,13 @@ const SelectMeal = () => {
       {/* Meal Cards */}
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <p className="text-xl">Loading meals...</p>
+          <p className="text-xl text-gray-800">Loading meals...</p>
         </div>
       ) : filteredMeals.length === 0 ? (
         <div className="flex justify-center items-center h-64">
-          <p className="text-xl">No meals found matching your criteria.</p>
+          <p className="text-xl text-gray-800">
+            No meals found matching your criteria.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-11/12 mx-auto py-8">
@@ -215,7 +229,7 @@ const SelectMeal = () => {
 
                 {/* Meal Content */}
                 <div className="p-6 flex flex-col flex-grow">
-                  <h2 className="text-3xl font-bold text-center mb-3">
+                  <h2 className="text-3xl font-bold text-center mb-3 text-gray-800">
                     {meal.mealName}
                   </h2>
 
@@ -244,7 +258,7 @@ const SelectMeal = () => {
                       {meal.portions.map((portion) => (
                         <span
                           key={portion._id || portion.size}
-                          className="px-2 py-1 bg-gray-100 rounded text-sm"
+                          className="px-2 py-1 bg-gray-100 rounded text-sm text-gray-800"
                         >
                           {portion.size}: ${portion.price.toFixed(2)}
                         </span>

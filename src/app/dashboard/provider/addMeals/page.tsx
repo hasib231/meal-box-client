@@ -12,7 +12,7 @@ const AddMealsPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+
   const { user } = useAuth();
   const router = useRouter();
 
