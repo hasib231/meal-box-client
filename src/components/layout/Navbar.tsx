@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const navigation = [
   { name: "Meal Plans", href: "/mealPlans" },
-  { name: "How It Works", href: "/howItWorks" },
+
   { name: "About Us", href: "/aboutUs" },
   { name: "Find Meals", href: "/findMeals" },
   { name: "Dashboard", href: "/dashboard" },

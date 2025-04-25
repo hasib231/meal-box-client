@@ -3,17 +3,18 @@
 
 import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { axiosProtected } from "@/lib/axios";
 
 const AddMealsPage = () => {
-  const { user, session } = useAuth();
-  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [success, setSuccess] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
 
   // Form state
   const [mealName, setMealName] = useState("");
@@ -140,17 +141,6 @@ const AddMealsPage = () => {
     }
 
     try {
-      // Get token from localStorage
-      const token = localStorage.getItem("accessToken") || session?.accessToken;
-
-      if (!token) {
-        const errorMsg = "Authentication token not found. Please log in again.";
-        toast.error(errorMsg);
-        setError(errorMsg);
-        setIsLoading(false);
-        return;
-      }
-
       // Create meal data object
       const mealData = {
         userId: user?.id,
@@ -173,28 +163,18 @@ const AddMealsPage = () => {
         formData.append("mealData", JSON.stringify(mealData));
 
         // Send request with FormData
-        response = await axios.post(
-          "http://localhost:8000/api/v1/meals/with-image",
+        response = await axiosProtected.post(
+          "api/v1/meals/with-image",
           formData,
           {
             headers: {
               "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
             },
           }
         );
       } else {
         // If no image, send JSON data directly
-        response = await axios.post(
-          "http://localhost:8000/api/v1/meals",
-          mealData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        response = await axiosProtected.post("api/v1/meals", mealData);
       }
 
       console.log("API response:", response.data);

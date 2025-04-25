@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
-import axios from "axios";
+import { axiosProtected } from "@/lib/axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -56,16 +56,10 @@ const TrackOrder = () => {
 
     const fetchOrders = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
-        if (!token || !user?.id) return;
+        if (!user?.id) return;
 
-        const response = await axios.get(
-          `http://localhost:8000/api/v1/customers/orders/${user.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await axiosProtected.get(
+          `api/v1/customers/orders/${user.id}`
         );
         console.log("User ID: ", user.id);
 
@@ -108,13 +102,8 @@ const TrackOrder = () => {
           await Promise.all(
             providerIds.map(async (providerId) => {
               try {
-                const providerResponse = await axios.get(
-                  `http://localhost:8000/api/v1/providers/user/${providerId}`,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  }
+                const providerResponse = await axiosProtected.get(
+                  `api/v1/providers/user/${providerId}`
                 );
 
                 if (providerResponse.data.success) {
@@ -143,18 +132,9 @@ const TrackOrder = () => {
   // Function to cancel an order
   const handleCancelOrder = async (orderId: string) => {
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
-
-      const response = await axios.patch(
-        `http://localhost:8000/api/v1/orders/${orderId}`,
-        { status: "cancelled" },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axiosProtected.patch(`api/v1/orders/${orderId}`, {
+        status: "cancelled",
+      });
 
       if (response.data.success) {
         // Update local state to reflect the change

@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import { axiosProtected } from "@/lib/axios";
 
 // Define the Meal type based on the backend model
 interface Portion {
@@ -42,12 +42,7 @@ const SelectMeal = () => {
   useEffect(() => {
     const fetchMeals = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
-        const response = await axios.get("http://localhost:8000/api/v1/meals", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axiosProtected.get("api/v1/meals");
 
         // Only show available meals
         const availableMeals = response.data.data.filter(

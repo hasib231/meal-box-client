@@ -6,7 +6,7 @@ import Image from "next/image";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "@/hooks/useAuth";
-import axios from "axios";
+import { axiosProtected } from "@/lib/axios";
 
 // Define types
 interface Portion {
@@ -184,15 +184,6 @@ const OrderPage = () => {
     setIsLoading(true);
 
     try {
-      // Get token from localStorage
-      const token = localStorage.getItem("accessToken");
-
-      if (!token) {
-        toast.error("Authentication token not found. Please log in again.");
-        router.push("/login");
-        return;
-      }
-
       // Create order data
       const orderData = {
         customerId: user.id,
@@ -212,15 +203,9 @@ const OrderPage = () => {
       };
 
       // Send request to create order
-      const response = await axios.post(
-        "http://localhost:8000/api/v1/customers/order",
-        orderData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await axiosProtected.post(
+        "api/v1/customers/order",
+        orderData
       );
 
       if (response.status === 201) {
