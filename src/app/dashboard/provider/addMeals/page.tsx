@@ -200,7 +200,7 @@ const AddMealsPage = () => {
 
         // Redirect to meals list or dashboard
         setTimeout(() => {
-          router.push("/providerDashboard");
+          router.push("/dashboard/provider/manageMenu");
         }, 2000);
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

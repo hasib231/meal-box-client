@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import {
   ChevronRight,
   Search,
-  Filter,
   CheckCircle,
   XCircle,
   Clock,
@@ -31,22 +30,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { formatDateTime, formatCurrency, getStatusColor } from "@/lib/utils";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { axiosProtected } from "@/lib/axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -213,25 +204,13 @@ export default function ResponsesPage() {
   // Loading state
   if (loading || authLoading) {
     return (
-      <div className="space-y-6">
-        <div className="h-10 w-[250px] bg-gray-200 animate-pulse rounded"></div>
-        <div className="h-4 w-[300px] bg-gray-200 animate-pulse rounded"></div>
-        <div className="flex flex-col gap-4 md:flex-row py-4">
-          <div className="h-10 flex-1 bg-gray-200 animate-pulse rounded"></div>
-          <div className="h-10 w-[200px] bg-gray-200 animate-pulse rounded"></div>
-        </div>
-        <div className="rounded-md border">
-          <div className="h-10 bg-muted/40 px-4 py-2"></div>
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex items-center px-4 py-4 border-t">
-              <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse mr-2"></div>
-              <div className="space-y-2 flex-1">
-                <div className="h-4 w-[200px] bg-gray-200 animate-pulse rounded"></div>
-                <div className="h-3 w-[150px] bg-gray-200 animate-pulse rounded"></div>
-              </div>
-              <div className="h-8 w-24 bg-gray-200 animate-pulse rounded"></div>
-            </div>
-          ))}
+      <div className="space-y-6 p-4">
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <div className="h-12 w-12 mb-4 rounded-full border-4 border-t-gray-200 border-r-gray-200 border-b-gray-800 border-l-gray-800 animate-spin"></div>
+          <p className="text-xl font-medium">Loading orders...</p>
+          <p className="text-muted-foreground">
+            Please wait while we fetch your order data
+          </p>
         </div>
       </div>
     );
@@ -378,8 +357,10 @@ export default function ResponsesPage() {
                     selectedOrder ? getStatusColor(selectedOrder.status) : ""
                   }
                 >
-                  {selectedOrder?.status.charAt(0).toUpperCase() +
-                    selectedOrder?.status.slice(1)}
+                  {selectedOrder && selectedOrder.status
+                    ? selectedOrder.status.charAt(0).toUpperCase() +
+                      selectedOrder.status.slice(1)
+                    : ""}
                 </Badge>
               </div>
 

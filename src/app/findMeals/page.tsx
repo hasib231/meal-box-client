@@ -32,7 +32,6 @@ const SelectMeal = () => {
   const [filteredMeals, setFilteredMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [dietFilter, setDietFilter] = useState("");
-  const [portionFilter, setPortionFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
 
@@ -70,13 +69,6 @@ const SelectMeal = () => {
       result = result.filter((meal) => meal.dietTags.includes(dietFilter));
     }
 
-    // Apply portion filter
-    if (portionFilter) {
-      result = result.filter((meal) =>
-        meal.portions.some((portion) => portion.size === portionFilter)
-      );
-    }
-
     // Apply search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
@@ -91,7 +83,7 @@ const SelectMeal = () => {
     }
 
     setFilteredMeals(result);
-  }, [dietFilter, portionFilter, searchTerm, meals]);
+  }, [dietFilter, searchTerm, meals]);
 
   const handleOrder = (meal: Meal) => {
     // Navigate to order page with meal information
@@ -113,11 +105,6 @@ const SelectMeal = () => {
   // Get unique diet tags from all meals
   const uniqueDietTags = [...new Set(meals.flatMap((meal) => meal.dietTags))];
 
-  // Get unique portion sizes from all meals
-  const uniquePortionSizes = [
-    ...new Set(meals.flatMap((meal) => meal.portions.map((p) => p.size))),
-  ];
-
   return (
     <div className="w-full">
       <ToastContainer position="top-right" autoClose={3000} />
@@ -125,7 +112,7 @@ const SelectMeal = () => {
       {/* Filter section - Updated with consistent colors regardless of theme */}
       <div className="w-full py-4 bg-gray-100 shadow-sm">
         <div className="flex flex-col md:flex-row justify-around items-center gap-4 px-4">
-          <div className="w-full md:w-3/12">
+          <div className="w-full md:w-5/12">
             <fieldset className="fieldset w-full">
               <legend className="fieldset-legend font-medium text-gray-800">
                 Diet Restriction
@@ -147,29 +134,7 @@ const SelectMeal = () => {
             </fieldset>
           </div>
 
-          <div className="w-full md:w-3/12">
-            <fieldset className="fieldset w-full">
-              <legend className="fieldset-legend font-medium text-gray-800">
-                Portion Size
-              </legend>
-              <select
-                value={portionFilter}
-                onChange={(e) => setPortionFilter(e.target.value)}
-                className="select border border-gray-300 rounded w-full p-2 
-                           bg-white text-gray-800"
-                style={{ backgroundColor: "white", color: "#1f2937" }}
-              >
-                <option value="">All Sizes</option>
-                {uniquePortionSizes.map((size) => (
-                  <option key={size} value={size}>
-                    {size.charAt(0).toUpperCase() + size.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </fieldset>
-          </div>
-
-          <div className="w-full md:w-3/12">
+          <div className="w-full md:w-5/12">
             <fieldset className="fieldset w-full">
               <legend className="fieldset-legend font-medium text-gray-800">
                 Search
