@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -15,57 +15,57 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Meal } from '@/lib/data';
-import { createMeal, updateMeal } from '@/lib/actions';
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Meal } from "@/lib/data";
+import { createMeal, updateMeal } from "@/lib/actions";
 
 const dietaryOptions = [
-  { id: 'vegetarian', label: 'Vegetarian' },
-  { id: 'vegan', label: 'Vegan' },
-  { id: 'gluten-free', label: 'Gluten Free' },
-  { id: 'dairy-free', label: 'Dairy Free' },
-  { id: 'nut-free', label: 'Nut Free' },
-  { id: 'low-carb', label: 'Low Carb' },
-  { id: 'keto', label: 'Keto' },
-  { id: 'paleo', label: 'Paleo' },
-  { id: 'high-protein', label: 'High Protein' },
+  { id: "vegetarian", label: "Vegetarian" },
+  { id: "vegan", label: "Vegan" },
+  { id: "gluten-free", label: "Gluten Free" },
+  { id: "dairy-free", label: "Dairy Free" },
+  { id: "nut-free", label: "Nut Free" },
+  { id: "low-carb", label: "Low Carb" },
+  { id: "keto", label: "Keto" },
+  { id: "paleo", label: "Paleo" },
+  { id: "high-protein", label: "High Protein" },
 ];
 
 const categories = [
-  'Bowls',
-  'Salads',
-  'Seafood',
-  'Meat',
-  'Vegetarian',
-  'Vegan',
-  'Breakfast',
-  'Snacks',
-  'Desserts',
+  "Bowls",
+  "Salads",
+  "Seafood",
+  "Meat",
+  "Vegetarian",
+  "Vegan",
+  "Breakfast",
+  "Snacks",
+  "Desserts",
 ];
 
 const mealFormSchema = z.object({
   name: z.string().min(3, {
-    message: 'Meal name must be at least 3 characters.',
+    message: "Meal name must be at least 3 characters.",
   }),
   description: z.string().min(10, {
-    message: 'Description must be at least 10 characters.',
+    message: "Description must be at least 10 characters.",
   }),
   price: z.coerce.number().min(0.01, {
-    message: 'Price must be greater than 0.',
+    message: "Price must be greater than 0.",
   }),
   image: z.string().url({
-    message: 'Please enter a valid URL for the image.',
+    message: "Please enter a valid URL for the image.",
   }),
   category: z.string({
-    required_error: 'Please select a category.',
+    required_error: "Please select a category.",
   }),
   dietaryOptions: z.array(z.string()).optional(),
   isAvailable: z.boolean().default(true),
@@ -75,7 +75,7 @@ type MealFormValues = z.infer<typeof mealFormSchema>;
 
 interface MealFormProps {
   meal?: Meal;
-  onSuccess: () => void;
+  onSuccess: (data: MealFormValues) => void;
   onCancel: () => void;
 }
 
@@ -84,11 +84,11 @@ export function MealForm({ meal, onSuccess, onCancel }: MealFormProps) {
   const isEditing = !!meal;
 
   const defaultValues: Partial<MealFormValues> = {
-    name: meal?.name || '',
-    description: meal?.description || '',
+    name: meal?.name || "",
+    description: meal?.description || "",
     price: meal?.price || 0,
-    image: meal?.image || '',
-    category: meal?.category || '',
+    image: meal?.image || "",
+    category: meal?.category || "",
     dietaryOptions: meal?.dietaryOptions || [],
     isAvailable: meal?.isAvailable ?? true,
   };
@@ -101,12 +101,15 @@ export function MealForm({ meal, onSuccess, onCancel }: MealFormProps) {
   async function onSubmit(data: MealFormValues) {
     setIsLoading(true);
     try {
+      console.log("Form data in MealForm:", data);
+
       if (isEditing && meal) {
         await updateMeal(meal.id, data);
       } else {
         await createMeal(data);
       }
-      onSuccess();
+
+      onSuccess(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -142,10 +145,10 @@ export function MealForm({ meal, onSuccess, onCancel }: MealFormProps) {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Fresh romaine lettuce with grilled chicken, parmesan, and our homemade caesar dressing." 
+                    <Textarea
+                      placeholder="Fresh romaine lettuce with grilled chicken, parmesan, and our homemade caesar dressing."
                       rows={3}
-                      {...field} 
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -174,7 +177,10 @@ export function MealForm({ meal, onSuccess, onCancel }: MealFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Category</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a category" />
@@ -182,7 +188,9 @@ export function MealForm({ meal, onSuccess, onCancel }: MealFormProps) {
                   </FormControl>
                   <SelectContent>
                     {categories.map((category) => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -199,7 +207,10 @@ export function MealForm({ meal, onSuccess, onCancel }: MealFormProps) {
                 <FormItem>
                   <FormLabel>Image URL</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com/image.jpg" {...field} />
+                    <Input
+                      placeholder="https://example.com/image.jpg"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
                     Enter a URL for the meal image.
@@ -240,7 +251,10 @@ export function MealForm({ meal, onSuccess, onCancel }: MealFormProps) {
                                   onCheckedChange={(checked) => {
                                     const currentValue = field.value || [];
                                     return checked
-                                      ? field.onChange([...currentValue, option.label])
+                                      ? field.onChange([
+                                          ...currentValue,
+                                          option.label,
+                                        ])
                                       : field.onChange(
                                           currentValue.filter(
                                             (value) => value !== option.label
@@ -289,17 +303,22 @@ export function MealForm({ meal, onSuccess, onCancel }: MealFormProps) {
         </div>
 
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
           <Button type="submit" disabled={isLoading}>
             {isLoading ? (
               <span className="flex items-center gap-1">
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                {isEditing ? 'Saving...' : 'Creating...'}
+                {isEditing ? "Saving..." : "Creating..."}
               </span>
             ) : (
-              <span>{isEditing ? 'Save Changes' : 'Create Meal'}</span>
+              <span>{isEditing ? "Save Changes" : "Create Meal"}</span>
             )}
           </Button>
         </div>

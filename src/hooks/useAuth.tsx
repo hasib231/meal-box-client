@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import type { Session } from "next-auth";
 import { axiosPublic } from "@/lib/axios";
 import { AUTH_ROUTES } from "@/routes/api-routes";
+import { useEffect } from "react";
 
 export function useAuth() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
 
   const isAuthenticated = status === "authenticated";
@@ -16,37 +17,44 @@ export function useAuth() {
     role?: "customer" | "provider";
   };
 
-// src/hooks/useAuth.tsx (update the login function)
+  // Force client-side route revalidation when session changes
+  useEffect(() => {
+    // This will trigger a rerender when session status changes
+  }, [status]);
 
-const login = async (email: string, password: string) => {
-  try {
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+  const login = async (email: string, password: string) => {
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-    if (result?.error) {
-      return { success: false, error: "Invalid email or password" };
+      if (result?.error) {
+        return { success: false, error: "Invalid email or password" };
+      }
+
+      // Get the session to access the token
+      const session = await getSession();
+
+      // Store the access token in localStorage
+      if (session?.accessToken) {
+        localStorage.setItem("accessToken", session.accessToken);
+        console.log("Access token stored in localStorage");
+      }
+
+      // Update session and force a complete refresh
+      await update();
+
+      // Use router.replace instead of push for a cleaner navigation
+      router.replace("/");
+
+      return { success: true };
+    } catch (error) {
+      console.error("Login error:", error);
+      return { success: false, error: "An unexpected error occurred" };
     }
-
-    // Get the session to access the token
-    const session = await getSession();
-    
-    // Store the access token in localStorage
-    if (session?.accessToken) {
-      localStorage.setItem("accessToken", session.accessToken);
-      console.log("Access token stored in localStorage");
-    }
-
-    router.push("/");
-    router.refresh();
-    return { success: true };
-  } catch (error) {
-    console.error("Login error:", error);
-    return { success: false, error: "An unexpected error occurred" };
-  }
-};
+  };
   const register = async (userData: {
     name: string;
     email: string;
@@ -133,10 +141,24 @@ const login = async (email: string, password: string) => {
   };
 
   const logout = async () => {
-    await signOut({ redirect: false });
-    router.push("/login");
-    router.refresh();
-    return { success: true };
+    try {
+      // First clear any local storage items
+      localStorage.removeItem("accessToken");
+
+      // Sign out without redirect and wait for it to complete
+      await signOut({
+        redirect: false,
+        callbackUrl: "/login",
+      });
+
+      // Force a client-side navigation to the login page
+      window.location.href = "/login";
+
+      return { success: true };
+    } catch (error) {
+      console.error("Logout error:", error);
+      return { success: false, error: "An error occurred during logout" };
+    }
   };
 
   const hasRole = (role: "customer" | "provider") => {

@@ -2,50 +2,59 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
+import { useAuth } from "@/hooks/useAuth";
 
 type Props = {
   Value: boolean;
 };
+
 const SideBar = ({ Value }: Props) => {
-  
-  const user = {"role":"provider"}
-  const comonNavigation = [
-      { name: "Home", href: "/" },
+  const { user } = useAuth();
+
+  const commonNavigation = [
+    { name: "Home", href: "/" },
+    { name: "Dashboard", href: "/dashboard" },
   ];
-    
+
   const providerNavigation = [
-      { name: "Manage Menue", href: "/dashboard/provider/manageMenue" },
-      { name: "Respond Orders", href: "/dashboard/provider/respondToOrder" },
-      { name: "View Order", href: "/dashboard/provider/viewOrder" },
-      { name: "Add Meals", href: "/dashboard/provider/addMeals" },
-      { name: "Provider Profile", href: "/dashboard/provider/profile" },
+    { name: "Manage Menu", href: "/dashboard/provider/manageMenue" },
+    { name: "Respond Orders", href: "/dashboard/provider/respondToOrder" },
+    { name: "View Order", href: "/dashboard/provider/viewOrder" },
+    { name: "Add Meals", href: "/dashboard/provider/addMeals" },
+    { name: "Provider Profile", href: "/dashboard/provider/profile" },
   ];
-    
+
   const customerNavigation = [
-      { name: "Find Meals", href: "/findMeals" },
-      { name: "Select Meals", href: "/dashboard/customer/selectMeals" },
-      { name: "Track Orders", href: "/dashboard/customer/trackOrders" },
-      { name: "Manage Preferences", href: "/dashboard/customer/managePreferences" },
-      { name: "Customer Profile", href: "/dashboard/customer/profile" },
+    { name: "Select Meals", href: "/dashboard/customer/selectMeals" },
+    { name: "Track Orders", href: "/dashboard/customer/trackOrders" },
+
+    { name: "Customer Profile", href: "/dashboard/customer/profile" },
   ];
-  const navigation =user?.role === 'provider' ? [...comonNavigation, ...providerNavigation] : [...comonNavigation, ...customerNavigation];
-  
-  const pathname=usePathname() 
-  console.log(pathname)
+
+  const navigation =
+    user?.role === "provider"
+      ? [...commonNavigation, ...providerNavigation]
+      : [...commonNavigation, ...customerNavigation];
+
+  const pathname = usePathname();
+
   return (
-    <div className="w-full  h-full sidebar">
-      <div className="w-9/12 mx-auto  h-full flex justify-center  items-center">
+    <div className="w-full h-full sidebar md:w-64">
+      <div className="w-10/12 mx-auto h-full flex justify-center items-center">
         <ul
-          className={` text-white  flex justify-start w-full flex-col   h-[80vh]  gap-6 items-start    text-left items-center${
-            Value ? " opacity-0" : ""
+          className={`text-white flex justify-start w-full flex-col h-[80vh] gap-6 items-start text-left ${
+            Value ? "opacity-0" : ""
           }`}
         >
           {navigation.map((item, id) => (
             <Link
               key={id}
               href={item.href}
-              className={`text-black ${pathname==item.href?"bg-white text-black p-2 rounded-lg":""}`}
+              className={`text-white hover:text-gray-200 ${
+                pathname === item.href
+                  ? "bg-red-900 text-white p-2 rounded-lg w-full"
+                  : ""
+              }`}
             >
               {item.name}
             </Link>

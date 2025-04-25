@@ -1,17 +1,19 @@
 // src/app/ProviderDashboard/AddMeals/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
-
+import axios from "axios";
 import { useRouter } from "next/navigation";
-import { axiosProtected } from "@/lib/axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddMealsPage = () => {
   const { user, session } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
   const [mealName, setMealName] = useState("");
@@ -25,6 +27,34 @@ const AddMealsPage = () => {
   ]);
   const [dietTags, setDietTags] = useState<string[]>([]);
   const [availability, setAvailability] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // Handle image selection
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setSelectedImage(file);
+
+    // Create preview
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
+    }
+  };
+
+  // Remove selected image
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   // Add ingredient to the list
   const addIngredient = () => {
@@ -74,7 +104,6 @@ const AddMealsPage = () => {
   };
 
   // Handle form submission
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -104,6 +133,7 @@ const AddMealsPage = () => {
     }
 
     if (validationError) {
+      toast.error(validationError);
       setError(validationError);
       setIsLoading(false);
       return;
@@ -114,7 +144,9 @@ const AddMealsPage = () => {
       const token = localStorage.getItem("accessToken") || session?.accessToken;
 
       if (!token) {
-        setError("Authentication token not found. Please log in again.");
+        const errorMsg = "Authentication token not found. Please log in again.";
+        toast.error(errorMsg);
+        setError(errorMsg);
         setIsLoading(false);
         return;
       }
@@ -130,15 +162,45 @@ const AddMealsPage = () => {
         availability,
       };
 
-      console.log("Sending meal data:", mealData);
+      // Create FormData if image is selected
+      let response;
+      if (selectedImage) {
+        const formData = new FormData();
+        // Add the image file
+        formData.append("image", selectedImage);
 
-      // Send request directly to the backend API
-      const response = await axiosProtected.post("/api/v1/meals", mealData);
+        // Add all meal data as JSON
+        formData.append("mealData", JSON.stringify(mealData));
+
+        // Send request with FormData
+        response = await axios.post(
+          "http://localhost:8000/api/v1/meals/with-image",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } else {
+        // If no image, send JSON data directly
+        response = await axios.post(
+          "http://localhost:8000/api/v1/meals",
+          mealData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
 
       console.log("API response:", response.data);
 
       if (response.status === 201 || response.status === 200) {
-        alert("Meal added successfully!");
+        toast.success("Meal added successfully!");
 
         // Reset form
         setMealName("");
@@ -150,9 +212,16 @@ const AddMealsPage = () => {
           { size: "large", price: 11.99 },
         ]);
         setDietTags([]);
+        setSelectedImage(null);
+        setImagePreview(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
 
         // Redirect to meals list or dashboard
-        router.push("/ProviderDashboard");
+        setTimeout(() => {
+          router.push("/providerDashboard");
+        }, 2000);
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
@@ -169,22 +238,28 @@ const AddMealsPage = () => {
           err.response.data?.message ||
           err.response.data?.error ||
           "Failed to add meal. Please try again.";
+
+        toast.error(errorMessage);
         setError(errorMessage);
       } else if (err.request) {
         // The request was made but no response was received
         console.error("No response received:", err.request);
-        setError(
-          "No response from server. Please check your connection and try again."
-        );
+        const errorMsg =
+          "No response from server. Please check your connection and try again.";
+        toast.error(errorMsg);
+        setError(errorMsg);
       } else {
         // Something happened in setting up the request that triggered an Error
         console.error("Error message:", err.message);
-        setError("An error occurred while sending the request.");
+        const errorMsg = "An error occurred while sending the request.";
+        toast.error(errorMsg);
+        setError(errorMsg);
       }
     } finally {
       setIsLoading(false);
     }
   };
+
   // Available diet tags
   const availableDietTags = [
     "vegetarian",
@@ -199,6 +274,7 @@ const AddMealsPage = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
+      <ToastContainer position="top-right" autoClose={3000} />
       <h1 className="text-2xl font-bold mb-6">Add New Meal</h1>
 
       {error && (
@@ -236,6 +312,55 @@ const AddMealsPage = () => {
             placeholder="Describe the meal"
             required
           />
+        </div>
+
+        {/* Image Upload */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Meal Image
+          </label>
+          <div className="mt-1 flex items-center">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              ref={fileInputRef}
+              className="sr-only"
+              id="meal-image"
+            />
+            <label
+              htmlFor="meal-image"
+              className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+            >
+              Choose Image
+            </label>
+            {selectedImage && (
+              <span className="ml-3 text-sm text-gray-500">
+                {selectedImage.name}
+              </span>
+            )}
+            {selectedImage && (
+              <button
+                type="button"
+                onClick={removeImage}
+                className="ml-3 text-sm text-red-500 hover:text-red-700"
+              >
+                Remove
+              </button>
+            )}
+          </div>
+
+          {imagePreview && (
+            <div className="mt-2">
+              <div className="relative w-32 h-32 overflow-hidden rounded-md">
+                <img
+                  src={imagePreview}
+                  alt="Meal preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Ingredients */}

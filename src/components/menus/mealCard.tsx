@@ -1,21 +1,20 @@
 "use client";
 
-import { useState } from 'react';
-import { MoreVertical, Edit, Trash} from 'lucide-react';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
+import { useState } from "react";
+import { MoreVertical, Edit, Trash } from "lucide-react";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Meal } from '@/lib/data';
-import { formatCurrency } from '@/lib/utils';
-import { 
+} from "@/components/ui/dropdown-menu";
+import { formatCurrency } from "@/lib/utils";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -24,28 +23,60 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { deleteMeal, updateMeal } from '@/lib/actions';
+} from "@/components/ui/alert-dialog";
 
-interface MealCardProps {
-  meal: Meal;
-  onEdit: (meal: Meal) => void;
-  onDelete: (meal: Meal) => void;
+// Define types for meal portions
+export interface Portion {
+  size: "small" | "medium" | "large";
+  price: number;
 }
 
-export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
+// Define a type for the meal object
+export interface MealCardType {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  dietaryOptions: string[];
+  isAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+  ingredients: string[];
+  portions: Portion[];
+}
+
+interface MealCardProps {
+  meal: MealCardType;
+  onEdit: (meal: MealCardType) => void;
+  onDelete: (meal: MealCardType) => void;
+  onAvailabilityChange?: (isAvailable: boolean) => Promise<boolean | undefined>;
+}
+
+export function MealCard({
+  meal,
+  onEdit,
+  onDelete,
+  onAvailabilityChange,
+}: MealCardProps) {
   const [isAvailable, setIsAvailable] = useState(meal.isAvailable);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAvailabilityToggle = async () => {
+    if (!onAvailabilityChange) return;
+
     setIsLoading(true);
     try {
       const newAvailability = !isAvailable;
-      await updateMeal(meal.id, { isAvailable: newAvailability });
-      setIsAvailable(newAvailability);
+      const success = await onAvailabilityChange(newAvailability);
+
+      if (success) {
+        setIsAvailable(newAvailability);
+      }
     } catch (error) {
-      console.error('Failed to update meal availability:', error);
+      console.error("Failed to update meal availability:", error);
     } finally {
       setIsLoading(false);
     }
@@ -54,10 +85,9 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
   const handleDelete = async () => {
     setIsLoading(true);
     try {
-      await deleteMeal(meal.id, meal.name);
       onDelete(meal);
     } catch (error) {
-      console.error('Failed to delete meal:', error);
+      console.error("Failed to delete meal:", error);
     } finally {
       setIsDeleteConfirmOpen(false);
       setIsLoading(false);
@@ -76,7 +106,11 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
           <div className="absolute right-2 top-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm">
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
+                >
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -85,7 +119,7 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
                   <Edit className="mr-2 h-4 w-4" />
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => setIsDeleteConfirmOpen(true)}
                   className="text-destructive focus:text-destructive"
                 >
@@ -108,7 +142,9 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
         <CardContent className="p-4">
           <div className="mb-2 flex items-center justify-between">
             <h3 className="line-clamp-1 text-lg font-semibold">{meal.name}</h3>
-            <p className="font-medium tabular-nums">{formatCurrency(meal.price)}</p>
+            <p className="font-medium tabular-nums">
+              {formatCurrency(meal.price)}
+            </p>
           </div>
           <p className="line-clamp-2 mb-3 text-sm text-muted-foreground">
             {meal.description}
@@ -123,45 +159,47 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
         </CardContent>
 
         <Separator />
-        
+
         <CardFooter className="p-4">
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-2">
-              <Switch 
-                id={`availability-${meal.id}`} 
+              <Switch
+                id={`availability-${meal.id}`}
                 checked={isAvailable}
                 onCheckedChange={handleAvailabilityToggle}
-                disabled={isLoading}
+                disabled={isLoading || !onAvailabilityChange}
               />
-              <span className="text-sm">{isAvailable ? 'Available' : 'Unavailable'}</span>
+              <span className="text-sm">
+                {isAvailable ? "Available" : "Unavailable"}
+              </span>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onEdit(meal)}
-            >
+            <Button variant="outline" size="sm" onClick={() => onEdit(meal)}>
               Edit Details
             </Button>
           </div>
         </CardFooter>
       </Card>
 
-      <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+      <AlertDialog
+        open={isDeleteConfirmOpen}
+        onOpenChange={setIsDeleteConfirmOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete {meal.name} from your menu. This action cannot be undone.
+              This will permanently delete {meal.name} from your menu. This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleDelete}
               disabled={isLoading}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isLoading ? 'Deleting...' : 'Delete'}
+              {isLoading ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
