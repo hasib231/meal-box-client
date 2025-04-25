@@ -1,10 +1,10 @@
 "use client";
 
 import Link from 'next/link';
-import { ChevronRight, Eye } from 'lucide-react';
+import {  Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, } from '@/components/ui/avatar';
 import {
   Table,
   TableBody,

@@ -7,20 +7,9 @@ import { usePathname } from "next/navigation";
 type Props = {
   Value: boolean;
 };
-
-// const navigation = [
-//   { name: "Select Meals", href: "/customerDashboard/select-meals" },
-//   { name: "Track Orders", href: "/customerDashboard/track-order" },
-//   { name: "Manage Preferences", href: "/customerDashboard/manage-preference" },
-//   { name: "Find Meals", href: "/customerDashboard/find-meals" },
-//   { name: "Order Meal", href: "/customerDashboard/order-meal" },
-//   { name: "Customer Profile", href: "/customerDashboard/customer-profile" },
-//   { name: "Home", href: "/" }
-// ];
-
 const SideBar = ({ Value }: Props) => {
   
-  const user = {"role":"customer"}
+  const user = {"role":"provider"}
   const comonNavigation = [
       { name: "Home", href: "/" },
   ];
@@ -30,7 +19,7 @@ const SideBar = ({ Value }: Props) => {
       { name: "Respond Orders", href: "/dashboard/provider/respondToOrder" },
       { name: "View Order", href: "/dashboard/provider/viewOrder" },
       { name: "Add Meals", href: "/dashboard/provider/addMeals" },
-      { name: "Provider Profile", href: "/dashboard/provider-profile" },
+      { name: "Provider Profile", href: "/dashboard/provider/profile" },
   ];
     
   const customerNavigation = [

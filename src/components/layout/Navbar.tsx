@@ -8,15 +8,11 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
 const navigation = [
-  { name: "Home", href: "/" },
-  { name: "Dashboard", href: "/dashboard" },
-  // { name: "customerDashboard", href: "/customerDashboard/order-meal" },
-  // { name: "mealProviderDashboard", href: "/mealProviderDashboard/postMeal" },
-  { name: "Meal Plans", href: "/meal-plans" },
-  { name: "How It Works", href: "/how-it-works" },
-  { name: "About Us", href: "/about" },
+  { name: "Meal Plans", href: "/mealPlans" },
+  { name: "How It Works", href: "/howItWorks" },
+  { name: "About Us", href: "/aboutUs" },
   { name: "Find Meals", href: "/findMeals" },
-  // { name: "AddMeals", href: " /ProviderDashboard/AddMeals " },
+  { name: "Dashboard", href: "/dashboard" },
 ];
 
 export default function Navbar() {

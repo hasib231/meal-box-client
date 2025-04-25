@@ -1,7 +1,7 @@
 "use client";
 
 // import { useToast } from "@/hooks/useTost";
-import { Meal, Order, OrderStatus } from "./data";
+import { Meal, OrderStatus } from "./data";
 
 // const { toast } = useToast();
 import { toast } from "sonner";
@@ -67,14 +67,6 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
   try {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const statusMessages = {
-      accepted: "Order has been accepted",
-      declined: "Order has been declined",
-      modified: "Order has been modified",
-      completed: "Order has been marked as completed",
-      cancelled: "Order has been cancelled",
-    };
     
     toast("Message sent!", {
         description: "Thanks for reaching out. I'll get back to you soon."
