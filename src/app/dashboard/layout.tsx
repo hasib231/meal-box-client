@@ -1,6 +1,7 @@
 "use client";
 
-import Navbar from "@/components/customerDashboardComponent/Navbar";
+
+import SideBar from "@/components/dashboardComponents/sideBer/SideBer";
 import { Button } from "@/components/ui/button";
 // import Footer from "@/customerDashboardComponent/Footer";
 
@@ -10,7 +11,7 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-const DashboardLayout = ({ children }: RootLayoutProps) => {
+const MainDashboardLayout = ({ children }: RootLayoutProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (
     <div className="flex h-screen">
@@ -20,7 +21,7 @@ const DashboardLayout = ({ children }: RootLayoutProps) => {
           isCollapsed ? "w-0 lg:w-[7%]" : "w-[50%] lg:w-[20%]"
         } fixed h-full overflow-y-auto bg-red-800 transition-all duration-300 z-10 lg:z-0`}
       >
-        <Navbar Value={isCollapsed} />
+        <SideBar Value={isCollapsed} />
         <Button
           className={`fixed bottom-4 text-white z-20 ${
             isCollapsed
@@ -48,4 +49,4 @@ const DashboardLayout = ({ children }: RootLayoutProps) => {
   );
 };
 
-export default DashboardLayout;
+export default MainDashboardLayout;

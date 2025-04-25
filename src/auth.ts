@@ -45,8 +45,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             role: userData.role,
           });
 
+          // Make sure to capture the accessToken from the response
           const accessToken =
             data.accessToken || data.token || userData.accessToken;
+          console.log(
+            "Auth: Access token captured:",
+            accessToken ? "Found" : "Not found"
+          );
 
           return {
             id: userData._id || userData.id,
