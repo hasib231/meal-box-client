@@ -17,7 +17,7 @@ const SideBar = ({ Value }: Props) => {
   ];
 
   const providerNavigation = [
-    { name: "Manage Menu", href: "/dashboard/provider/manageMenue" },
+    { name: "Manage Menu", href: "/dashboard/provider/manageMenu" },
     { name: "Respond Orders", href: "/dashboard/provider/respondToOrder" },
     { name: "View Order", href: "/dashboard/provider/viewOrder" },
     { name: "Add Meals", href: "/dashboard/provider/addMeals" },

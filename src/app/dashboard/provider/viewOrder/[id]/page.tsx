@@ -1,21 +1,15 @@
-import { Order, orders } from '@/lib/data';
-import { OrderDetails } from '@/components/orders/order-details';
-import { notFound } from 'next/navigation';
+import { Order } from "@/lib/data";
 
-interface OrderPageProps {
-  params: {
-    id: string;
-  };
+interface OrderDetailsProps {
+  order: Order;
 }
 
-export default function OrderPage({ params }: OrderPageProps) {
-  // Find the order with the matching ID
-  const order = orders.find((order) => order.id === params.id);
-
-  // If no order is found, show the 404 page
-  if (!order) {
-    notFound();
-  }
-
-  return <OrderDetails order={order} />;
+export function OrderDetails({ order }: OrderDetailsProps) {
+  return (
+    <div>
+      <h2>Order Details</h2>
+      <p>Order ID: {order.id}</p>
+      {/* Add more order details as needed */}
+    </div>
+  );
 }
