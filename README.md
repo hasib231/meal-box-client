@@ -1,4 +1,49 @@
+# MealBox
+
+A personalized meal planning and delivery service application that makes healthy eating simple and delicious.
+
+## Live Demo
+
+Visit the live application: [MealBox](https://mealbox-client-nine.vercel.app/)
+
+## Project Overview
+
+MealBox allows customers to:
+
+- Choose from various meal plans based on dietary preferences
+- Schedule convenient delivery times
+- Enjoy chef-prepared meals tailored to their taste
+
+Providers can:
+
+- Create and manage meal offerings
+- Track orders
+- Manage their profile and services
+
+## Technologies Used
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Environment Setup
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```
+# API Configuration
+NEXT_PUBLIC_API_URL=your_backend_api_url
+
+# Authentication
+NEXT_PUBLIC_JWT_SECRET=your_jwt_secret
+
+# External Services (if applicable)
+NEXT_PUBLIC_UPLOAD_SERVICE_URL=your_image_upload_service
+NEXT_PUBLIC_PAYMENT_GATEWAY=your_payment_gateway_url
+
+# Other Configuration
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+Make sure to replace the placeholder values with your actual configuration.
 
 ## Getting Started
 
