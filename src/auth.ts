@@ -25,7 +25,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           );
           const data = response.data;
 
-          console.log("Auth: Login response:", JSON.stringify(data, null, 2));
+      
 
           if (!response.status || response.status !== 200) {
             throw new Error(data.message || "Authentication failed");
