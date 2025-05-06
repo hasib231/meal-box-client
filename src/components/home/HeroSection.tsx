@@ -57,3 +57,5 @@ export default function HeroSection() {
     </section>
   );
 }
+
+// This component is a hero section for a meal planning and delivery service website. It includes a title, description, call-to-action buttons, and an image of a healthy meal plate. The design is responsive and adapts to different screen sizes.
